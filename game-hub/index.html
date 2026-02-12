@@ -1,0 +1,524 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Game Hub</title>
+    <style>
+      :root{
+        --bg:#0b1020;
+        --panel:#121a33;
+        --panel2:#0f1730;
+        --text:#e8ebff;
+        --muted:#a9b1d6;
+        --border:rgba(255,255,255,.10);
+        --shadow: 0 12px 40px rgba(0,0,0,.45);
+        --radius:16px;
+        --radius2:22px;
+      }
+      *{box-sizing:border-box}
+      body{
+        margin:0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        background:
+          radial-gradient(900px 420px at 20% -10%, rgba(131, 103, 255, .22), transparent 60%),
+          radial-gradient(800px 460px at 100% 10%, rgba(0, 199, 255, .18), transparent 55%),
+          radial-gradient(900px 520px at 60% 120%, rgba(255, 60, 172, .12), transparent 60%),
+          var(--bg);
+        color:var(--text);
+      }
+      a{color:inherit}
+      .wrap{
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 20px 18px 22px;
+      }
+
+      /* Topbar */
+      .topbar{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        padding: 14px 16px;
+        border:1px solid var(--border);
+        border-radius: var(--radius2);
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+      .brand{
+        display:flex; align-items:center; gap:10px;
+      }
+      .logo{
+        width:36px; height:36px; border-radius:12px;
+        background: linear-gradient(135deg, rgba(131,103,255,.95), rgba(0,199,255,.85));
+        box-shadow: 0 10px 24px rgba(0,0,0,.35);
+      }
+      .title{
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing:.2px;
+        line-height: 1.1;
+      }
+      .subtitle{
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .status{
+        display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+        justify-content:flex-end;
+      }
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border:1px solid var(--border);
+        background: rgba(0,0,0,.18);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .dot{
+        width:8px; height:8px; border-radius:99px;
+        background: rgba(255,255,255,.35);
+        box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+      }
+      .dot.on{ background: #34d399; box-shadow: 0 0 0 4px rgba(52,211,153,.18); }
+      .dot.err{ background: #fb7185; box-shadow: 0 0 0 4px rgba(251,113,133,.18); }
+
+      /* Layout */
+      .grid{
+        display:grid;
+        grid-template-columns: 360px 1fr;
+        gap: 14px;
+        margin-top: 14px;
+      }
+      @media (max-width: 980px){
+        .grid{ grid-template-columns: 1fr; }
+      }
+
+      /* Panels */
+      .panel{
+        border:1px solid var(--border);
+        border-radius: var(--radius2);
+        background: rgba(18,26,51,.72);
+        box-shadow: var(--shadow);
+        overflow:hidden;
+      }
+      .panelHeader{
+        padding: 14px 14px 10px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+      }
+      .panelHeader h3{
+        margin:0;
+        font-size: 13px;
+        letter-spacing:.3px;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .panelBody{ padding: 14px; }
+
+      /* Game cards */
+      .cards{
+        display:grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .card{
+        display:flex;
+        gap:12px;
+        padding: 12px;
+        border-radius: var(--radius);
+        border:1px solid var(--border);
+        background: rgba(0,0,0,.16);
+        cursor:pointer;
+        transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      }
+      .card:hover{
+        transform: translateY(-1px);
+        border-color: rgba(255,255,255,.18);
+        background: rgba(0,0,0,.22);
+      }
+      .card.active{
+        border-color: rgba(131,103,255,.55);
+        background: rgba(131,103,255,.12);
+      }
+      .badge{
+        width:40px; height:40px;
+        border-radius: 14px;
+        display:grid; place-items:center;
+        font-weight: 800;
+        background: rgba(255,255,255,.06);
+        border: 1px solid var(--border);
+      }
+      .meta{
+        flex:1;
+        min-width:0;
+      }
+      .meta .name{
+        font-size: 14px;
+        font-weight: 800;
+        margin: 1px 0 2px;
+      }
+      .meta .desc{
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.3;
+      }
+      .meta .url{
+        margin-top: 6px;
+        font-size: 11px;
+        color: rgba(232,235,255,.65);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Controls */
+      .controls{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .btn{
+        appearance:none;
+        border:none;
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255,255,255,.08);
+        color: var(--text);
+        border: 1px solid var(--border);
+        cursor:pointer;
+        font-weight: 700;
+        transition: transform .10s ease, background .10s ease, border-color .10s ease, opacity .10s ease;
+      }
+      .btn:hover{ background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.18); }
+      .btn:active{ transform: translateY(1px); }
+      .btn.primary{
+        background: linear-gradient(135deg, rgba(131,103,255,.95), rgba(0,199,255,.75));
+        border-color: rgba(255,255,255,.18);
+      }
+      .btn.danger{
+        background: rgba(251,113,133,.12);
+        border-color: rgba(251,113,133,.25);
+      }
+      .btn:disabled{
+        opacity:.45;
+        cursor:not-allowed;
+      }
+      .row2{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+        margin-top: 10px;
+      }
+      .field{
+        flex:1;
+        min-width: 120px;
+        display:flex;
+        gap:8px;
+        align-items:center;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border:1px solid var(--border);
+        background: rgba(0,0,0,.14);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .field input{
+        width: 100%;
+        border:none;
+        outline:none;
+        background:transparent;
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      /* Viewer */
+      .viewer{
+        position:relative;
+        height: calc(100vh - 140px);
+        min-height: 520px;
+      }
+      @media (max-width: 980px){
+        .viewer{ height: 70vh; min-height: 460px; }
+      }
+      .viewerHeader{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(0,0,0,.12);
+      }
+      .viewerHeader .left{
+        min-width:0;
+      }
+      .viewerHeader .left .h{
+        font-size: 14px;
+        font-weight: 900;
+        margin: 0;
+        line-height: 1.15;
+      }
+      .viewerHeader .left .s{
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 720px;
+      }
+      .viewerHeader .right{
+        display:flex;
+        gap:8px;
+        align-items:center;
+      }
+      .mini{
+        padding: 8px 10px;
+        border-radius: 999px;
+        border:1px solid var(--border);
+        background: rgba(255,255,255,.06);
+        cursor:pointer;
+        font-weight: 800;
+        color: var(--text);
+      }
+      iframe{
+        width:100%;
+        height: calc(100% - 56px);
+        border:0;
+        background: #0b1020;
+      }
+
+      /* Log */
+      .log{
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 11px;
+        line-height: 1.35;
+        color: rgba(232,235,255,.72);
+        background: rgba(0,0,0,.18);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 10px;
+        max-height: 180px;
+        overflow:auto;
+      }
+      .muted{ color: var(--muted); }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            <div class="title">Game Hub</div>
+            <div class="subtitle">Unified launcher & control panel · Hub @5175 · Games @5173/@5174</div>
+          </div>
+        </div>
+        <div class="status">
+          <span class="pill"><span id="dot" class="dot"></span><span id="statusText">No game loaded</span></span>
+          <span class="pill">Current: <strong id="currentName" style="color:var(--text)">—</strong></span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Left -->
+        <div class="panel">
+          <div class="panelHeader"><h3>Games</h3></div>
+          <div class="panelBody">
+            <div class="cards">
+              <div class="card" id="cardDice" data-key="dice">
+                <div class="badge">D</div>
+                <div class="meta">
+                  <div class="name">Dice Game</div>
+                  <div class="desc">Local running game instance</div>
+                  <div class="url" id="urlDice">http://localhost:5173/</div>
+                </div>
+              </div>
+
+              <div class="card" id="cardEcho" data-key="echo">
+                <div class="badge">E</div>
+                <div class="meta">
+                  <div class="name">Fate’s Echo</div>
+                  <div class="desc">Local running game instance</div>
+                  <div class="url" id="urlEcho">http://localhost:5174/</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:12px"></div>
+
+            <div class="panelHeader" style="margin:0 -14px; border-radius: 0;"><h3>Unified Controls</h3></div>
+            <div style="height:10px"></div>
+
+            <div class="controls">
+              <button class="btn primary" id="btnInit">INIT</button>
+              <button class="btn" id="btnStart">START</button>
+              <button class="btn danger" id="btnRestart">RESTART</button>
+              <button class="btn" id="btnPing">PING</button>
+            </div>
+
+            <div class="row2">
+              <div class="field" title="sent in GAME_INIT payload">
+                User
+                <input id="userId" value="u1" />
+              </div>
+              <div class="field" title="sent in GAME_INIT payload">
+                Lang
+                <input id="lang" value="zh" />
+              </div>
+              <div class="field" title="sent in GAME_INIT payload">
+                Volume
+                <input id="volume" value="0.8" />
+              </div>
+            </div>
+
+            <div style="height:10px"></div>
+            <div class="muted" style="font-size:12px; margin-bottom:6px;">Event Log</div>
+            <div id="log" class="log"></div>
+          </div>
+        </div>
+
+        <!-- Right -->
+        <div class="panel viewer">
+          <div class="viewerHeader">
+            <div class="left">
+              <p class="h" id="viewerTitle" style="margin:0;">Select a game</p>
+              <div class="s" id="viewerUrl">—</div>
+            </div>
+            <div class="right">
+              <button class="mini" id="btnOpenNew">Open in new tab</button>
+              <button class="mini" id="btnReload">Reload</button>
+            </div>
+          </div>
+          <iframe id="frame"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const GAMES = {
+        dice: { name: "Dice Game", url: "http://localhost:5173/" },
+        echo: { name: "Fate’s Echo", url: "http://localhost:5174/" }
+      };
+
+      let currentKey = null;
+      let currentOrigin = null;
+
+      const frame = document.getElementById("frame");
+      const dot = document.getElementById("dot");
+      const statusText = document.getElementById("statusText");
+      const currentName = document.getElementById("currentName");
+      const viewerTitle = document.getElementById("viewerTitle");
+      const viewerUrl = document.getElementById("viewerUrl");
+      const logEl = document.getElementById("log");
+
+      const cardDice = document.getElementById("cardDice");
+      const cardEcho = document.getElementById("cardEcho");
+
+      function log(msg){
+        const t = new Date().toLocaleTimeString();
+        const line = `[${t}] ${msg}`;
+        const div = document.createElement("div");
+        div.textContent = line;
+        logEl.appendChild(div);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function setStatus(mode, text){
+        dot.classList.remove("on","err");
+        if (mode === "on") dot.classList.add("on");
+        if (mode === "err") dot.classList.add("err");
+        statusText.textContent = text;
+      }
+
+      function setActive(key){
+        currentKey = key;
+        const g = GAMES[key];
+        currentOrigin = new URL(g.url).origin;
+
+        // UI
+        cardDice.classList.toggle("active", key === "dice");
+        cardEcho.classList.toggle("active", key === "echo");
+        currentName.textContent = g.name;
+        viewerTitle.textContent = g.name;
+        viewerUrl.textContent = g.url;
+
+        setStatus("on", "Loaded");
+        log(`Loaded ${g.name}`);
+        frame.src = g.url;
+      }
+
+      function send(type, payload = {}){
+        if (!currentOrigin || !frame.contentWindow){
+          setStatus("err", "No game loaded");
+          return;
+        }
+        frame.contentWindow.postMessage({ type, payload }, currentOrigin);
+        log(`→ ${type} ${JSON.stringify(payload)}`);
+      }
+
+      // Cards
+      cardDice.addEventListener("click", () => setActive("dice"));
+      cardEcho.addEventListener("click", () => setActive("echo"));
+
+      // Buttons
+      document.getElementById("btnInit").addEventListener("click", () => {
+        const payload = {
+          userId: document.getElementById("userId").value.trim(),
+          lang: document.getElementById("lang").value.trim(),
+          volume: Number(document.getElementById("volume").value)
+        };
+        send("GAME_INIT", payload);
+      });
+      document.getElementById("btnStart").addEventListener("click", () => send("GAME_START"));
+      document.getElementById("btnRestart").addEventListener("click", () => send("GAME_RESTART"));
+      document.getElementById("btnPing").addEventListener("click", () => send("GAME_PING"));
+
+      document.getElementById("btnReload").addEventListener("click", () => {
+        if (!currentKey) return;
+        frame.src = GAMES[currentKey].url;
+        log("Reload iframe");
+      });
+
+      document.getElementById("btnOpenNew").addEventListener("click", () => {
+        if (!currentKey) return;
+        window.open(GAMES[currentKey].url, "_blank");
+      });
+
+      // Receive messages
+      window.addEventListener("message", (e) => {
+        if (!currentOrigin || e.origin !== currentOrigin) return;
+        const msg = e.data || {};
+        if (!msg.type) return;
+
+        log(`← ${msg.type} ${JSON.stringify(msg.payload || {})}`);
+
+        if (msg.type === "GAME_READY") {
+          setStatus("on", "Game ready");
+        }
+        if (msg.type === "GAME_ERROR") {
+          setStatus("err", "Game error");
+        }
+        if (msg.type === "GAME_RESULT") {
+          // optional: pop up
+          alert(`RESULT: ${JSON.stringify(msg.payload)}`);
+        }
+      });
+
+      // Init UI
+      setStatus("", "No game loaded");
+      log("Hub ready. Select a game on the left.");
+    </script>
+  </body>
+</html>
+
