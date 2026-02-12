@@ -1,4 +1,5 @@
 npm install
 npm run dev
 
-another two games should be runnng on different ports
+The other two games should be running locally on different ports.
+
